@@ -1,6 +1,7 @@
 from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
 from functions.write_file import write_file
+from functions.run_python import run_python_file
 
 
 def test_get_files_info():
@@ -61,6 +62,21 @@ def test_write_file():
     print_result(result, "'/pkg' directory")
 
 
+def test_run_python():
+    print("┌────────────────────┐")
+    print("| Testing run_python |")
+    print("└────────────────────┘\n")
+
+    result = run_python_file("calculator", "main.py")
+    print_result(result, "'main.py'")
+    result = run_python_file("calculator", "tests.py")
+    print_result(result, "'tests.py'")
+    result = run_python_file("calculator", "../main.py")
+    print_result(result, "'../main.py'")
+    result = run_python_file("calculator", "nonexistent.py")
+    print_result(result, "'nonexistent.py'")
+
+
 def print_result(result, message):
     print(f"Result for {message}:")
     print(result)
@@ -70,4 +86,5 @@ def print_result(result, message):
 if __name__ == "__main__":
     # test_get_files_info()
     # test_get_file_content()
-    test_write_file()
+    # test_write_file()
+    test_run_python()

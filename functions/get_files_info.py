@@ -2,7 +2,6 @@ import os
 
 
 def get_files_info(working_directory, directory=None):
-
     abs_working_dir = os.path.abspath(working_directory)
     target_dir = abs_working_dir
 
@@ -26,4 +25,4 @@ def get_files_info(working_directory, directory=None):
         return "\n".join(files)
 
     except Exception as e:
-        return f"Error: {e}"
+        return f'Error reading directory "{directory}": {e}'

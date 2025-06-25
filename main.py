@@ -6,6 +6,7 @@ from google.genai import types
 
 from prompts import system_prompt
 from call_function import call_function, available_functions
+from config import MAX_ITERS
 
 
 def main():
@@ -33,7 +34,18 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)])
     ]
 
-    generate_content(client, messages, verbose)
+    for i in range(MAX_ITERS):
+        try:
+            final_response = generate_content(client, messages, verbose)
+            if final_response:
+                print("Final response:")
+                print(final_response)
+                return
+        except Exception as e:
+            print(f"Errors in generate_content: {e}")
+
+    print(f"Maximum iterations ({MAX_ITERS}) reached.")
+    sys.exit(1)
 
 
 def generate_content(client, messages, verbose):
@@ -48,20 +60,24 @@ def generate_content(client, messages, verbose):
         )
     )
 
-    metadata = response.usage_metadata
-
     if verbose:
+        metadata = response.usage_metadata
         print(f"Prompt tokens: {metadata.prompt_token_count}")
         print(f"Response tokens: {metadata.candidates_token_count}")
 
+    if response.candidates:
+        for candidate in response.candidates:
+            messages.append(candidate.content)
+
     if not response.function_calls:
-        print(f"Response:\n{response.text}")
-        return
+        return response.text
 
     function_responses = call_functions(response.function_calls, verbose)
 
     if not function_responses:
         raise Exception("No function responses generated")
+
+    messages.append(types.Content(role="tool", parts=function_responses))
 
 
 def call_functions(function_calls, verbose):

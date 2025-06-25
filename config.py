@@ -1,2 +1,3 @@
 MAX_CHARS = 10_000
 TIMEOUT_SECONDS = 30
+WORKING_DIR = "./calculator"

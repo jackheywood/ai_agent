@@ -5,6 +5,7 @@ from google import genai
 from google.genai import types
 
 from prompts import system_prompt
+from call_function import available_functions
 
 
 def main():
@@ -37,20 +38,27 @@ def main():
 
 def generate_content(client, messages, verbose):
     model_name = "gemini-2.0-flash-001"
-    
+
     response = client.models.generate_content(
         model=model_name,
         contents=messages,
-        config=types.GenerateContentConfig(system_instruction=system_prompt)
+        config=types.GenerateContentConfig(
+            tools=[available_functions],
+            system_instruction=system_prompt,
+        )
     )
-    
+
     metadata = response.usage_metadata
 
     if verbose:
         print(f"Prompt tokens: {metadata.prompt_token_count}")
         print(f"Response tokens: {metadata.candidates_token_count}")
 
-    print(f"Response:\n{response.text}")
+    if not response.function_calls:
+        print(f"Response:\n{response.text}")
+
+    for function_call in response.function_calls:
+        print(f"Calling function: {function_call.name}({function_call.args})")
 
 
 if __name__ == "__main__":

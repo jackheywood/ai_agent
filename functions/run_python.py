@@ -1,5 +1,7 @@
 import os
 import subprocess
+from google.genai import types
+
 from config import TIMEOUT_SECONDS
 
 
@@ -40,3 +42,23 @@ def run_python_file(working_directory, file_path, args=None):
 
     except Exception as e:
         return f"Error: executing Python file: {e}"
+
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Executes a specified python file with optional arguments, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The path of the python file to execute, relative to the working directory.",
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description="The arguments for the python file. If not provided, executes the file without arguments.",
+                items=types.Schema(type=types.Type.STRING),
+            ),
+        },
+    ),
+)

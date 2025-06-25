@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
+from prompts import system_prompt
+
 
 def main():
     # Check for required arguments
@@ -11,8 +13,10 @@ def main():
     args = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
 
     if not args:
-        print("ERROR: Please provide a prompt for the AI.")
-        exit(1)
+        print("AI Code Assistant")
+        print('Usage: python main.py "<prompt>" [--verbose]')
+        print('Example: python main.py "How do I fix the calculator?"')
+        sys.exit(1)
 
     # Create client
     load_dotenv()
@@ -32,10 +36,14 @@ def main():
 
 
 def generate_content(client, messages, verbose):
+    model_name = "gemini-2.0-flash-001"
+    
     response = client.models.generate_content(
-        model="gemini-2.0-flash-001",
+        model=model_name,
         contents=messages,
+        config=types.GenerateContentConfig(system_instruction=system_prompt)
     )
+    
     metadata = response.usage_metadata
 
     if verbose:
